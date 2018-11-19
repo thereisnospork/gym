@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 env = gym.make('CartPole-v0')
-
+env.reset()
 sess = tf.InteractiveSession()
 
 x = tf.placeholder(tf.float32, shape=[None, 4])  # input params from gym cartpole-v0
@@ -56,7 +56,7 @@ def defuzz(fuzz):
 with tf.name_scope('cross_entropy'):
     cross_entropy = tf.multiply(-1.0, tf.matmul(Q,Q))  # run_episode(env))
 
-ew
+
 sess.run(tf.global_variables_initializer())
 
 for i in range(100):
