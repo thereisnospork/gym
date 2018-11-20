@@ -9,7 +9,7 @@ env.reset()
 sess = tf.InteractiveSession()
 
 observations = tf.placeholder(tf.float32, shape=[None, 4])  # input params from gym cartpole-v0
-actions = tf.placeholder(tf.float32, shape=[None, 2]) #placeholder for action space (left , right)
+action_hist = tf.placeholder(tf.float32, shape=[None, 2]) #placeholder for action space (left , right)
 # y_ = tf.placeholder(tf.float32, shape=[None, 765675])  #
 Q_target = tf.placeholder(tf.float32, shape=[None])
 
@@ -22,7 +22,7 @@ layer5 = tf.layers.dense(layer4, 100, tf.nn.softplus, bias_initializer=tf.random
 
 output = tf.layers.dense(layer5, 2, tf.nn.softplus) #value for left and for right
 
-Q = tf.reduce_sum(tf.multiply(output, actions), axis=1)            # Q is our predicted Q value.
+Q = tf.reduce_sum(tf.multiply(output, action_hist), axis=1)            # Q is our predicted Q value.
 
 loss = tf.reduce_mean(tf.square(Q_target-Q))
 
@@ -32,27 +32,34 @@ sess.run(tf.global_variables_initializer())
 
 
 for _ in range(1000): #epochs
-    env.reset()
-    rewards = []
-    actions = [] #blank lists for values
-    observations = []
-    obs = env.reset #environment initial state
+    reward_hist = []
+    action_hist = [] #blank lists for values
+    obs_hist = []
+    obs = env.reset() #environment initial state
 
     for each in range(201): # iterate through frames in environment
-        # obs = np.reshape(obs, (-1, 4))
-        action = 1 #fill in action loic here
+        obs = np.reshape(obs, (-1, 4))
+        print(type(obs))
+
+
+        Qs = sess.run(output, feed_dict= {observations:obs.reshape(-1,4)})
+        choice = np.argmax(Qs)
+        action = choice
+        #add random partition for action
         obs, reward, done, info = env.step(action)
-        rewards.append(reward)
-        actions.append(action)
-        observations.append(obs)
+        obs = np.array(obs)
+
+        reward_hist.append(reward)
+        action_hist.append(action)
+        obs_hist.append(obs.flatten())
         if done:
             break
 
-#compute discounted rewards
-#feed actions:rewards to Q network
+#compute discounted reward_hist
+#feed action_hist:reward_hist to Q network
 #update gradients
 #add batching?
-print(rewards)
+print(reward_hist)
 
 
 # for i in range(10):
