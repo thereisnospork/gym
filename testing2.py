@@ -28,9 +28,31 @@ loss = tf.reduce_mean(tf.square(Q_target-Q))
 
 optimizer = tf.train.AdamOptimizer().minimize(loss)
 
+sess.run(tf.global_variables_initializer())
 
 
+for _ in range(1000): #epochs
+    env.reset()
+    rewards = []
+    actions = [] #blank lists for values
+    observations = []
+    obs = env.reset #environment initial state
 
+    for each in range(201): # iterate through frames in environment
+        # obs = np.reshape(obs, (-1, 4))
+        action = 1 #fill in action loic here
+        obs, reward, done, info = env.step(action)
+        rewards.append(reward)
+        actions.append(action)
+        observations.append(obs)
+        if done:
+            break
+
+#compute discounted rewards
+#feed actions:rewards to Q network
+#update gradients
+#add batching?
+print(rewards)
 
 
 # for i in range(10):
